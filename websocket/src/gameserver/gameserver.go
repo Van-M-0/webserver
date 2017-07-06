@@ -1,28 +1,45 @@
 package gameserver
 
 import (
-	"net"
+	"tcpserver"
+	"proto"
 	"fmt"
 )
 
 type GameServer struct {
-	gwconn 		net.Conn
+	gwClient 		*tcpserver.TcpClient
 }
 
 func NewGameServer() *GameServer {
-	return &GameServer{
+	gs := &GameServer{}
 
+	cli, err := tcpserver.NewDailClient(&tcpserver.TcpOption{
+		Addr: ":9092",
+		Activecb: func(cli *tcpserver.TcpClient) {
+
+		},
+		Closecb: func(cli *tcpserver.TcpClient) {
+
+		},
+		Auth: func(cli *tcpserver.TcpClient) error {
+			return nil
+		},
+		Msgcb: func(cli *tcpserver.TcpClient, m *proto.Message) {
+
+		},
+	})
+	if err != nil {
+		fmt.Println("create gw client error")
+		return nil
 	}
+
+	gs.gwClient = cli
+
+	return gs
 }
 
 func (gs *GameServer) Start() {
-	conn, err := net.Dial("tcp", ":9090")
-	if err != nil {
-		fmt.Println("game server conn errror", err)
-		return
-	}
-	gs.gwconn = conn
-
+	go gs.tcpServer.Start()
 }
 
 

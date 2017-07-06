@@ -17,7 +17,8 @@ type TcpClient struct {
 }
 
 func (cli *TcpClient) Close() {
-
+	cli.conn.Close()
+	close(cli.sendch)
 }
 
 func (cli *TcpClient) Start() {
@@ -63,7 +64,7 @@ func NewDailClient(opt *TcpOption) (*TcpClient, error) {
 
 	opt.Activecb(cli)
 
-	if opt.Auth {
+	if opt.Auth != nil {
 		if err := opt.Auth(cli); err != nil {
 			return nil, err
 		}

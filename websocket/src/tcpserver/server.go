@@ -66,7 +66,7 @@ func (server *TcpServer) ServeClient(conn net.Conn) {
 
 	server.Opts.Activecb(cli)
 
-	if server.Opts.Auth {
+	if server.Opts.Auth != nil {
 		if err := server.Opts.Auth(cli); err != nil {
 			return
 		}
