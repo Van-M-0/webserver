@@ -76,6 +76,22 @@ func (dp *DbProxy) DropTable(v ...interface{}) {
 
 // logic handler
 
+func (dp *DbProxy) InitTable() {
+	dp.CreateTableIfNot(&proto.T_Accounts{})
+	dp.CreateTableIfNot(&proto.T_Games{})
+	dp.CreateTableIfNot(&proto.T_GamesArchive{})
+	dp.CreateTableIfNot(&proto.T_Guests{})
+	dp.CreateTableIfNot(&proto.T_Message{})
+	dp.CreateTableIfNot(&proto.T_Rooms{})
+	dp.CreateTableIfNot(&proto.T_RoomUser{})
+	dp.CreateTableIfNot(&proto.T_Users{})
+	dp.CreateTableIfNot(&proto.T_MyTest{})
+}
+
+func (dp *DbProxy) PreLoadData() {
+
+}
+
 // t_accounts : account info
 func (dp *DbProxy) GetAccountInfo(account string, accInfo *proto.T_Accounts) bool {
 	return dp.db.Where(&proto.T_Accounts{Account: account}).First(accInfo).RowsAffected != 0

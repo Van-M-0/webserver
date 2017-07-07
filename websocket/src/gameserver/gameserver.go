@@ -2,17 +2,48 @@ package gameserver
 
 import (
 	"tcpserver"
-	"export"
+	"scenemgr"
 	"fmt"
 	"proto"
+	"gateway"
 )
 
 type GameServer struct {
 	gwClient 		*tcpserver.TcpClient
-	mgr 			export.SceneManager
+	mgr      		scenemgr.SceneManager
+	gwServer 		*gateway.Gateway
 }
 
-func NewGameServer(manager export.SceneManager) *GameServer {
+func NewSingleGameServer(mgr scenemgr.SceneManager, addr string) *GameServer {
+	gs := &GameServer{}
+
+	gmgr := &GameServerMgr{
+		gameServer: gs,
+		manager: mgr,
+	}
+	mgr.OnInit(gmgr)
+
+	gs.gwServer = gateway.NewGateway(&gateway.GateOption{
+		Addr: addr,
+		Active: func(uid uint32, addr string) {
+			gmgr.OnClientConnected(uid, addr)
+		},
+		Close: func(uid uint32) {
+			gmgr.OnClientDisconnected(uid)
+		},
+		Auth: func(uid uint32, addr string) error {
+			return nil
+		},
+		Msg: func(uid uint32, message *proto.Message) {
+			gmgr.OnClientMessage(uid, message)
+		},
+	})
+
+
+	return gs
+}
+
+func newGameServer(manager scenemgr.SceneManager) *GameServer {
 	gs := &GameServer{}
 	cli, err := tcpserver.NewDailClient(&tcpserver.TcpOption{
 		Addr: ":9099",
@@ -34,7 +65,7 @@ func NewGameServer(manager export.SceneManager) *GameServer {
 		return nil
 	}
 
-	gf := &GameFrame{
+	gf := &GameServerMgr{
 		gameServer: gs,
 	}
 
@@ -46,6 +77,9 @@ func NewGameServer(manager export.SceneManager) *GameServer {
 	return gs
 }
 
+func (gs *GameServer) Start() {
+	gs.gwServer.Start()
+}
 
 
 

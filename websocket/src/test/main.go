@@ -1,13 +1,16 @@
 package main
 
 import (
-	"gateway"
 	"sync"
+	"scenemgr"
+	"gameserver"
 )
 
 func main() {
-	gw := gateway.NewGateway()
-	gw.Start()
+
+	sm := scenemgr.NewSceneManager()
+	gs := gameserver.NewSingleGameServer(sm, ":9091")
+	gs.Start()
 
 	wg := new(sync.WaitGroup)
 	wg.Add(1)

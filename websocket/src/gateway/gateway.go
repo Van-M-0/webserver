@@ -3,42 +3,49 @@ package gateway
 import (
 	"proto"
 	"webserver"
-	"fmt"
 	"tcpserver"
 	"dbproxy"
 )
 
+type OnClientActive 	func(uid uint32, addr string)
+type OnClientClose 		func(uid uint32)
+type OnClientMessage 	func(uint32 uint32, message *proto.Message)
+type AuthClient 		func(uint32 uint32, addr string) error
+
+type GateOption struct {
+	Addr 			string
+	Active 			OnClientActive
+	Close 			OnClientClose
+	Msg 			OnClientMessage
+	Auth 			AuthClient
+}
+
 type Gateway struct {
+	*ClientManager
 	webServer 		*webserver.WebSocketServer
 	tcpServer 		*tcpserver.TcpServer
 	dbProxy 		*dbproxy.DbProxy
 }
 
-func NewGateway() *Gateway {
-	gateway := &Gateway{}
+func NewGateway(opt *GateOption) *Gateway {
+	gateway := &Gateway{
+		ClientManager: NewClientManager(opt),
+	}
 
 	gateway.webServer = webserver.NewWebSocketServer(&webserver.WebOption{
-		Addr: ":9091",
+		Addr: opt.Addr,
 		Path: "/game",
 		Activecb: func(client *webserver.WebClient) {
-			fmt.Println("web connection connected")
+			gateway.OnClientConnected(client)
 		},
 		Closecb: func(client *webserver.WebClient) {
-			fmt.Println("web connection closed")
+			gateway.OnClientDisconnct(client)
 		},
 		Authcb: func(client *webserver.WebClient) error {
-			return nil
+			return gateway.OnClientAuth(client)
 		},
 		Msgcb: func(client *webserver.WebClient, message *proto.Message) {
-			fmt.Println("web connection message", message)
-			if message.Cmd == 101 {
-				client.Send(&proto.Message{
-					Cmd: 102,
-					Msg: &proto.GuestAuthMessage{
-						Account: "hello world",
-					},
-				})
-			}
+			gateway.OnClientMessage(client, message)
 		},
 	})
 
@@ -74,34 +81,7 @@ func NewGateway() *Gateway {
 }
 
 func (gw *Gateway) Start() {
-	gw.InitDabase()
-
 	go gw.webServer.Start()
-	//go gw.tcpServer.Start()
 }
 
-func (gw *Gateway) InitDabase() {
-	gw.dbProxy.CreateTableIfNot(&proto.T_Accounts{})
-	gw.dbProxy.CreateTableIfNot(&proto.T_Games{})
-	gw.dbProxy.CreateTableIfNot(&proto.T_GamesArchive{})
-	gw.dbProxy.CreateTableIfNot(&proto.T_Guests{})
-	gw.dbProxy.CreateTableIfNot(&proto.T_Message{})
-	gw.dbProxy.CreateTableIfNot(&proto.T_Rooms{})
-	gw.dbProxy.CreateTableIfNot(&proto.T_RoomUser{})
-	gw.dbProxy.CreateTableIfNot(&proto.T_Users{})
-	gw.dbProxy.CreateTableIfNot(&proto.T_MyTest{})
 
-	gw.LoadDatata()
-}
-
-func (gw *Gateway) LoadDatata() {
-	var accInfo proto.T_Accounts
-	gw.dbProxy.GetAccountInfo("van", &accInfo)
-	fmt.Println("get account info ", accInfo)
-
-	var userInfo proto.T_Users
-	gw.dbProxy.GetUserInfo("van", &userInfo)
-	fmt.Println("get user info ", userInfo)
-
-	gw.dbProxy.ModifyUserInfo(1, &proto.T_Users{Account: "van"})
-}

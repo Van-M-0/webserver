@@ -8,6 +8,7 @@ import (
 )
 
 type WebClient struct {
+	Uid 		uint32
 	conn 		*websocket.Conn
 	Opts 		*WebOption
 	sendch 		chan *proto.Message
@@ -32,6 +33,10 @@ func (wb *WebClient) start() {
 	}
 	go wb.readLoop()
 	go wb.writeLoop()
+}
+
+func (wb *WebClient) ActiveClose() {
+
 }
 
 func (wb *WebClient) close() {
@@ -95,4 +100,8 @@ func (wb *WebClient) sendEncode(m *proto.Message) {
 		fmt.Println("web client flush message error ", err)
 		return
 	}
+}
+
+func (we *WebClient) ClientAddr() string {
+	return we.conn.RemoteAddr().String()
 }

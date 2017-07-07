@@ -1,4 +1,4 @@
-package export
+package scenemgr
 
 import "proto"
 
