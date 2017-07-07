@@ -50,6 +50,7 @@ cc.Class({
     },
     
     playBGM(url){
+        return
         var audioUrl = this.getUrl(url);
         console.log(audioUrl);
         if(this.bgmAudioID >= 0){

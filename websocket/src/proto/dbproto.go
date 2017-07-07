@@ -66,7 +66,7 @@ type T_Users struct {
 	Userid 		uint32		`gorm:"primary_key;AUTO_INCREMENT;not null"`
 	Account 	string 		`gorm:"size:32;not null;default:'';index:acc_index"`
 	Name 		string 		`gorm:"size:32;default:null"`
-	Sex 		byte
+	Sex 		uint8
 	Headimg 	string
 	Level 		uint8 		`gorm:"default:1"`
 	Exp 		uint32		`gorm:"default:0"`

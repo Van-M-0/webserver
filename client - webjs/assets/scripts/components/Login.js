@@ -58,10 +58,9 @@ cc.Class({
             return;
         }
         cc.vv.http.url = cc.vv.http.master_url;
-        cc.vv.net.addHandler('push_need_create_role',function(){
-            console.log("onLoad:push_need_create_role");
-            cc.director.loadScene("createrole");
-        });
+        // cc.vv.net.addHandler(203,function(){
+        //     cc.director.loadScene("createrole");
+        // });
         
         cc.vv.audioMgr.playBGM("bgMain.mp3");
         

@@ -5,6 +5,7 @@ import (
 	"proto"
 	"github.com/ugorji/go/codec"
 	"fmt"
+	"encoding/json"
 )
 
 type WebClient struct {
@@ -49,6 +50,7 @@ func (wb *WebClient) readLoop() {
 		wb.close()
 	}()
 
+	/*
 	decodec := new(codec.JsonHandle)
 	for {
 		mt, raw, err := wb.conn.ReadMessage()
@@ -57,7 +59,7 @@ func (wb *WebClient) readLoop() {
 			return
 		}
 
-		fmt.Println("web conn recv message ", mt, raw, err)
+		fmt.Println("<web message type> ", mt)
 
 		var msg proto.Message
 		if err := codec.NewDecoderBytes(raw, decodec).Decode(&msg); err != nil {
@@ -65,6 +67,35 @@ func (wb *WebClient) readLoop() {
 			return
 		}
 
+		wb.Opts.Msgcb(wb, &msg)
+	}
+	*/
+
+	for {
+		mt, raw, err := wb.conn.ReadMessage()
+		if err != nil {
+			fmt.Println("web socket conn recv msg err ", err)
+			return
+		}
+
+		fmt.Println("<web message type> ", mt)
+
+		var msg proto.Message
+		if err := json.Unmarshal(raw, &msg); err != nil {
+			fmt.Println("web socket conn decode msg err ", err)
+		}
+
+		var ok bool
+		if msg.Msg, ok = proto.NewStruct(msg.Cmd); !ok {
+			fmt.Println("web socket conn decode msg err, cmd unkown", msg.Cmd)
+			continue
+		}
+
+		if err := json.Unmarshal(raw, &msg); err != nil {
+			fmt.Println("web socket conn decode msg err ", err)
+		}
+
+		fmt.Println("unmarshal msg : ", msg)
 		wb.Opts.Msgcb(wb, &msg)
 	}
 }

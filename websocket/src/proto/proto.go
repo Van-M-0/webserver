@@ -1,5 +1,38 @@
 package proto
 
+/*
+import "reflect"
+
+func regiseter(i interface{}) reflect.Type {
+	return reflect.TypeOf(i).Elem()
+}
+
+func NewStruct(cmd uint16) (interface{}, bool) {
+	if i, ok := messageCenter[cmd]; ok {
+		return reflect.New(i).Elem().Interface(), true
+	}
+	return nil, false
+}
+
+var messageCenter = map[uint16]reflect.Type{
+	CmdGuestAuth: 		regiseter((*AuthGuest_C)(nil)),
+	CmdLoginLobby:		regiseter((*Login_C)(nil)),
+	CmdCreateAccount: 	regiseter((*CreateAccount_C)(nil)),
+}
+*/
+
+func NewStruct(cmd uint16) (interface{}, bool) {
+	switch cmd {
+	case CmdGuestAuth:
+		return &AuthGuest_C{}, true
+	case CmdLoginLobby:
+		return &Login_C{}, true
+	case CmdCreateAccount:
+		return &CreateAccount_C{}, true
+	}
+	return nil, false
+}
+
 const (
 	CmdWebgateStart 		uint16 = 101
 	CmdLoginStart 			uint16 = 201
@@ -16,6 +49,9 @@ const (
 
 	// login server proto 201 - 300
 	CmdGuestAuth				uint16 = 201
+	CmdLoginLobby 				uint16 = 202
+	CmdCreateAccount 			uint16 = 203
+
 
 	//game server proto 1001 - 2000
 
@@ -30,23 +66,65 @@ type RegiseterServer struct {
 }
 
 type ServerInfo struct {
-	Name 		string		`codec:"name"`
-	Type 		int 		`codec:"type"`
-	Id 			int			`codec:"id"`
+	Name 		string				`json:"name"`
+	Type 		int 				`json:"type"`
+	Id 			int					`json:"id"`
 }
 
 type ServerList struct {
-	Servers 	[]*ServerInfo	`codec:"servers"`
+	Servers 	[]*ServerInfo		`json:"servers"`
 }
 
 type Message struct {
-	Cmd 		uint16				`codec:"cmd"`
-	Msg 		interface{}			`codec:"msg"`
+	Cmd 		uint16				`json:"cmd"`
+	Msg 		interface{}			`json:"msg"`
+}
+
+type AuthGuest_C struct {
+	Account 	string 				`json:"account"`
 }
 
 type GuestAuthMessage struct {
-	Account 	string				`codec:"account"`
+	ErrCode 	int 				`json:"errcode"`
+	Account 	string				`json:"account"`
+	Sign 		string 				`json:"sign"`
 }
 
+type Login_C struct {
+	Account 	string				`json:"account"`
+	Sign 		string				`json:"sign"`
+}
+
+type LoginLobbyScucess struct {
+	ErrCode 	int 				`json:"errcode"`
+	Account 	string 				`json:"account"`
+	UserId 		uint32 				`json:"userid"`
+	Name 		string 				`json:"name"`
+	Level 		uint8 				`json:"lv"`
+	Exp 		uint32 				`json:"exp"`
+	Coins 		uint32 				`json:"coins"`
+	Gems 		uint32 				`json:"gems"`
+	RoomId 		string 				`json:"roomid"`
+	Sex 		uint8 				`json:"sex"`
+	Ip 			string  			`json:"ip"`
+}
+
+type CreateAccount_C struct {
+	Account 	string 				`json:"account"`
+	Sign 		string 				`json:"sign"`
+	Name 		string 				`json:"name"`
+}
+
+type CreateAccountSuccess struct {
+	ErrCode 	int 				`json:"errcode"`
+	Account 	string				`json:"account"`
+	Sign 		string				`json:"sign"`
+}
+
+type EnterRoom_C struct {
+	Account 	string 				`json:"account"`
+	Sign 		string 				`json:"sign"`
+	RoomId 		string 				`json:"roomid"`
+}
 
 

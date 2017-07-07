@@ -13,7 +13,11 @@ type ClientManager struct {
 	clientIds 		map[uint32]*webserver.WebClient
 	cliIdGen 		uint32
 
-	msgChanel 		*sync.RWMutex
+	gsOpt 			*GateOption
+	lsOpt 			*GateOption
+
+	lsMsgChanel 	*sync.RWMutex
+	gsMsgChanel 	*sync.RWMutex
 }
 
 func NewClientManager(opt *GateOption) *ClientManager {
@@ -22,7 +26,16 @@ func NewClientManager(opt *GateOption) *ClientManager {
 		idLock: new(sync.RWMutex),
 		clientIds: make(map[uint32]*webserver.WebClient),
 		cliIdGen: 0,
-		msgChanel: new(sync.RWMutex),
+		lsMsgChanel: new(sync.RWMutex),
+		gsMsgChanel: new(sync.RWMutex),
+	}
+}
+
+func (cm *ClientManager) RegisterNoitfier(option *GateOption) {
+	if option.Type == "gameserver" {
+		cm.gsOpt = option
+	} else if option.Type == "lobby" {
+		cm.lsOpt = option
 	}
 }
 
@@ -45,17 +58,13 @@ func (cm *ClientManager) OnClientConnected(client *webserver.WebClient) {
 	client.Uid = id
 	cm.idLock.Unlock()
 
-	cm.opt.Active(id, client.ClientAddr())
+	//cm.opt.Active(id, client.ClientAddr())
+	cm.lsOpt.Active(id, client.ClientAddr())
 }
 
 func (cm *ClientManager) OnClientDisconnct(client *webserver.WebClient) {
-	cm.idLock.Lock()
-	if _, ok := cm.clientIds[client.Uid]; ok {
-		delete(cm.clientIds, client.Uid)
-	}
-	cm.idLock.Unlock()
-
-	cm.opt.Close(client.Uid)
+	//cm.opt.Close(client.Uid)
+	cm.lsOpt.Close(client.Uid)
 }
 
 func (cm *ClientManager) OnClientAuth(client *webserver.WebClient) error {
@@ -64,9 +73,18 @@ func (cm *ClientManager) OnClientAuth(client *webserver.WebClient) error {
 
 func (cm *ClientManager) OnClientMessage(client *webserver.WebClient, message *proto.Message) {
 	if client != nil {
-		cm.msgChanel.Lock()
-		cm.opt.Msg(client.Uid, message)
-		cm.msgChanel.Unlock()
+		//cm.msgChanel.Lock()
+		//cm.opt.Msg(client.Uid, message)
+		//cm.msgChanel.Unlock()
+		if message.Cmd < 1000 {
+			cm.lsMsgChanel.Lock()
+			cm.lsOpt.Msg(client.Uid, message)
+			cm.lsMsgChanel.Unlock()
+		} else {
+			cm.gsMsgChanel.Lock()
+			cm.gsOpt.Msg(client.Uid, message)
+			cm.gsMsgChanel.Unlock()
+		}
 	}
 }
 

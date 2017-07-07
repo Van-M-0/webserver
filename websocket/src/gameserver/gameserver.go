@@ -14,7 +14,7 @@ type GameServer struct {
 	gwServer 		*gateway.Gateway
 }
 
-func NewSingleGameServer(mgr scenemgr.SceneManager, addr string) *GameServer {
+func NewSingleGameServer(mgr scenemgr.SceneManager, gw *gateway.Gateway) *GameServer {
 	gs := &GameServer{}
 
 	gmgr := &GameServerMgr{
@@ -23,8 +23,9 @@ func NewSingleGameServer(mgr scenemgr.SceneManager, addr string) *GameServer {
 	}
 	mgr.OnInit(gmgr)
 
-	gs.gwServer = gateway.NewGateway(&gateway.GateOption{
-		Addr: addr,
+	gs.gwServer = gw
+	gw.RegisterNoitfier(&gateway.GateOption{
+		Type: "gameserver",
 		Active: func(uid uint32, addr string) {
 			gmgr.OnClientConnected(uid, addr)
 		},
@@ -38,7 +39,6 @@ func NewSingleGameServer(mgr scenemgr.SceneManager, addr string) *GameServer {
 			gmgr.OnClientMessage(uid, message)
 		},
 	})
-
 
 	return gs
 }
@@ -78,7 +78,6 @@ func newGameServer(manager scenemgr.SceneManager) *GameServer {
 }
 
 func (gs *GameServer) Start() {
-	gs.gwServer.Start()
 }
 
 

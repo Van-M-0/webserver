@@ -7,14 +7,13 @@ cc.Class({
 	extends: cc.Component,
 
 	statics: {
-		handlers: {},
+    	handlers: {},
 		ip: "127.0.0.1:9091",
 		so: null,
-		constatus: "closed",
-
-		addHandler: function(evnet, fn) {
-			var handler = function(data) {
-				data = JSON.parse(data)
+		constatus: "closed", 
+		
+		addHandler: function(event, fn) {
+			var handler = function(data) {	
 				fn(data)
 			}
 			this.handlers[event] = handler
@@ -30,12 +29,20 @@ cc.Class({
 		connect: function(cb) {
 			var self = this
 			var websocket = new WebSocket("ws://"+this.ip+"/game")
+
 			websocket.onopen = function(event) {
 				self.onopen(event, cb)
 			}
-			websocket.onclose = this.onclose
-	        websocket.onmessage = this.onMessage
-	        websocket.onerror = this.onerror
+			websocket.onclose = function(event) {
+				self.onclose(event)
+			}
+	        websocket.onmessage = function(event) {
+	        	self.onMessage(event)
+	        }
+	        websocket.onerror = function(event) {
+	        	self.onerror(event)
+	        }
+
 	        this.so = websocket
 	        this.constatus = "connecting"
 		},
@@ -54,7 +61,15 @@ cc.Class({
 		},
 
 		onMessage: function(event) {
-			console.log("connection message " + event.data)
+			var data = JSON.parse(event.data)
+			console.log("connection message " , data, this.handlers[data.cmd])
+			var handler = this.handlers[data.cmd]
+			if (handler) {
+				console.log("connection process ", data.msg)
+				handler(data.msg)
+			} else {
+				console.log("not have ", data.cmd);
+			}
 		},
 
 		onerror: function(event) {
@@ -78,8 +93,8 @@ cc.Class({
 				})
 			} else {
 				self.so.send(msg)
-				console.log("send msg ", cmd, data, ret)
+				console.log("send msg ", cmd, data)
 			}
-		}
+		},
 	},
 })

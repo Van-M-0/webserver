@@ -1869,9 +1869,13 @@
       "__id__": 32
     },
     "_enabled": true,
-    "target": null,
+    "target": {
+      "__id__": 43
+    },
     "_isShow": false,
-    "lblContent": null
+    "lblContent": {
+      "__id__": 41
+    }
   },
   {
     "__type__": "cc.PrefabInfo",

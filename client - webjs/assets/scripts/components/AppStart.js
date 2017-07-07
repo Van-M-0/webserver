@@ -27,8 +27,8 @@ function initMgr(){
     
     cc.vv.http = require("HTTP");
     cc.vv.global = require("Global");
-    cc.vv.net = require("Net")
-    
+    cc.vv.net = require("Net");
+
     var GameNetMgr = require("GameNetMgr");
     cc.vv.gameNetMgr = new GameNetMgr();
     cc.vv.gameNetMgr.initHandlers();

@@ -7,6 +7,7 @@ import (
 	"proto"
 )
 
+//CREATE DATABASE IF NOT EXISTS mygame default charset utf8 COLLATE utf8_general_ci;
 type DbProxy struct {
 	Opts 		*DbOption
 	uri 		string
@@ -50,6 +51,8 @@ func NewDbProxy(opt *DbOption) *DbProxy {
 
 	dp.db = db
 
+	dp.InitTable()
+
 	return dp
 }
 
@@ -60,7 +63,7 @@ func (dp *DbProxy) CreatTable(v ...interface{}) {
 func (dp *DbProxy) CreateTableIfNot(v ...interface{}) {
 	for _, m := range v {
 		if dp.db.HasTable(m) == false {
-			dp.db.CreateTable(m)
+			dp.db.CreateTable(m).Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8")
 		}
 	}
 }
@@ -103,6 +106,7 @@ func (dp *DbProxy) AddAccountInfo(accInfo *proto.T_Accounts) bool {
 
 // t_users : user info
 func (dp *DbProxy) AddUserInfo(userInfo *proto.T_Users) bool {
+	fmt.Println("add user info : ", userInfo)
 	return dp.db.Create(userInfo).RowsAffected != 0
 }
 

@@ -27,12 +27,13 @@ cc.Class({
             cc.sys.localStorage.setItem("account",account);
         }
         
-        console.log("guestAuth")
-        cc.vv.net.send(101, {account:account})
+        cc.vv.net.addHandler(201, this.onAuth)
+        cc.vv.net.send(201, {account:account})
         //cc.vv.http.sendRequest("/guest",{account:account},this.onAuth);
     },
     
     onAuth:function(ret){
+        console.log("auth ", ret);
         var self = cc.vv.userMgr;
         if(ret.errcode !== 0){
             console.log(ret.errmsg);
@@ -54,9 +55,11 @@ cc.Class({
             else{
                 if(!ret.userid){
                     //jump to register user info.
+                    console.log("create");
                     cc.director.loadScene("createrole");
                 }
                 else{
+                    console.log("hall");
                     console.log(ret);
                     self.account = ret.account;
         			self.userId = ret.userid;
@@ -73,7 +76,9 @@ cc.Class({
             }
         };
         cc.vv.wc.show("正在登录游戏");
-        cc.vv.http.sendRequest("/login",{account:this.account,sign:this.sign},onLogin);
+        cc.vv.net.addHandler(202, onLogin)
+        cc.vv.net.send(202, {account:this.account,sign:this.sign})
+        //cc.vv.http.sendRequest("/login",{account:this.account,sign:this.sign},onLogin);
     },
     
     create:function(name){
@@ -92,7 +97,9 @@ cc.Class({
             sign:this.sign,
             name:name
         };
-        cc.vv.http.sendRequest("/create_user",data,onCreate);    
+        cc.vv.net.addHandler(203, onCreate)
+        cc.vv.net.send(203, data)
+        //cc.vv.http.sendRequest("/create_user",data,onCreate);    
     },
     
     enterRoom:function(roomId,callback){

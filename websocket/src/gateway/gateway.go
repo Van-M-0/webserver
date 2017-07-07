@@ -13,6 +13,8 @@ type OnClientMessage 	func(uint32 uint32, message *proto.Message)
 type AuthClient 		func(uint32 uint32, addr string) error
 
 type GateOption struct {
+	Type 			string
+	Id 				uint32
 	Addr 			string
 	Active 			OnClientActive
 	Close 			OnClientClose
@@ -68,20 +70,9 @@ func NewGateway(opt *GateOption) *Gateway {
 	})
 	*/
 
-	gateway.dbProxy = dbproxy.NewDbProxy(&dbproxy.DbOption{
-		Host: "127.0.0.1:3306",
-		User: "root",
-		Pass: "1",
-		Name: "mygame",
-		ShowDetailLog: true,
-		Singular: true,
-	})
-
 	return gateway
 }
 
 func (gw *Gateway) Start() {
 	go gw.webServer.Start()
 }
-
-
