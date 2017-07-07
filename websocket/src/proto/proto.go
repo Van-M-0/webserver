@@ -29,6 +29,8 @@ func NewStruct(cmd uint16) (interface{}, bool) {
 		return &Login_C{}, true
 	case CmdCreateAccount:
 		return &CreateAccount_C{}, true
+	case CmdCreateRoom:
+		return &CreateRoom_C{}, true
 	}
 	return nil, false
 }
@@ -51,7 +53,7 @@ const (
 	CmdGuestAuth				uint16 = 201
 	CmdLoginLobby 				uint16 = 202
 	CmdCreateAccount 			uint16 = 203
-
+	CmdCreateRoom 				uint16 = 204
 
 	//game server proto 1001 - 2000
 
@@ -121,10 +123,14 @@ type CreateAccountSuccess struct {
 	Sign 		string				`json:"sign"`
 }
 
+type CreateRoom_C struct {
+	Account 	string 				`json:"account"`
+	Sign 		string				`json:"sign"`
+	//Conf		CreateRoomConf		`json:"conf"`
+}
+
 type EnterRoom_C struct {
 	Account 	string 				`json:"account"`
 	Sign 		string 				`json:"sign"`
 	RoomId 		string 				`json:"roomid"`
 }
-
-

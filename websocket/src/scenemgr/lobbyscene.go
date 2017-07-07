@@ -61,11 +61,13 @@ func (sm *LobbySceneMgr) OnClientMessage(id uint32, m *proto.Message) {
 	fmt.Println("lobby scene manager recv message .. ", id, m)
 	switch m.Cmd {
 	case proto.CmdGuestAuth:
-		sm.HandleGuest(id, m.Msg.(*proto.AuthGuest_C))
+		sm.handleGuest(id, m.Msg.(*proto.AuthGuest_C))
 	case proto.CmdLoginLobby:
-		sm.HandleLogin(id, m.Msg.(*proto.Login_C))
+		sm.handleLogin(id, m.Msg.(*proto.Login_C))
 	case proto.CmdCreateAccount:
-		sm.HandleCreateAccount(id, m.Msg.(*proto.CreateAccount_C))
+		sm.handleCreateAccount(id, m.Msg.(*proto.CreateAccount_C))
+	case proto.CmdCreateRoom:
+		sm.handleCreateRoom(id, m.Msg.(*proto.CreateRoom_C))
 	default:
 		fmt.Println("recv unkown cmd ", m.Cmd)
 	}
@@ -86,7 +88,7 @@ func (sm *LobbySceneMgr) SendUserMessage(id uint32, cmd uint16, i interface{}) {
 	})
 }
 
-func (sm *LobbySceneMgr) HandleGuest(id uint32, c *proto.AuthGuest_C) {
+func (sm *LobbySceneMgr) handleGuest(id uint32, c *proto.AuthGuest_C) {
 	sm.SendUserMessage(id, proto.CmdGuestAuth, &proto.GuestAuthMessage {
 		ErrCode: 0,
 		Account: c.Account,
@@ -94,7 +96,7 @@ func (sm *LobbySceneMgr) HandleGuest(id uint32, c *proto.AuthGuest_C) {
 	})
 }
 
-func (sm *LobbySceneMgr) HandleLogin(id uint32, c *proto.Login_C) {
+func (sm *LobbySceneMgr) handleLogin(id uint32, c *proto.Login_C) {
 	acc := "guest_" + c.Account
 	var userInfo proto.T_Users
 	if sm.dbProxy.GetUserInfo(acc, &userInfo) {
@@ -120,7 +122,7 @@ func (sm *LobbySceneMgr) HandleLogin(id uint32, c *proto.Login_C) {
 	}
 }
 
-func (sm *LobbySceneMgr) HandleCreateAccount(id uint32, c *proto.CreateAccount_C) {
+func (sm *LobbySceneMgr) handleCreateAccount(id uint32, c *proto.CreateAccount_C) {
 	acc := "guest_" + c.Account
 	var userInfo proto.T_Users
 	fmt.Println("create account ", acc, c)
@@ -156,4 +158,6 @@ func (sm *LobbySceneMgr) HandleCreateAccount(id uint32, c *proto.CreateAccount_C
 	}
 }
 
+func (sm *LobbySceneMgr) handleCreateRoom(id uint32, c *proto.CreateRoom_C) {
 
+}
