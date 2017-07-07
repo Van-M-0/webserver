@@ -4,6 +4,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/jinzhu/gorm"
 	"fmt"
+	"proto"
 )
 
 type DbProxy struct {
@@ -73,5 +74,65 @@ func (dp *DbProxy) DropTable(v ...interface{}) {
 	dp.db.DropTableIfExists(v...)
 }
 
+// logic handler
 
+// t_accounts : account info
+func (dp *DbProxy) GetAccountInfo(account string, accInfo *proto.T_Accounts) bool {
+	return dp.db.Where(&proto.T_Accounts{Account: account}).First(accInfo).RowsAffected != 0
+}
 
+func (dp *DbProxy) AddAccountInfo(accInfo *proto.T_Accounts) bool {
+	return dp.db.Create(accInfo).RowsAffected != 0
+}
+
+// t_users : user info
+func (dp *DbProxy) AddUserInfo(userInfo *proto.T_Users) bool {
+	return dp.db.Create(userInfo).RowsAffected != 0
+}
+
+func (dp *DbProxy) GetUserInfo(account string, userInfo *proto.T_Users) bool {
+	return dp.db.Where("account = ? ", account).
+		Select("userid, account, name, sex, headimg, level, exp, coins, gems, roomid").
+		Find(&userInfo).
+		RowsAffected != 0
+}
+
+func (dp *DbProxy) GetUserInfoByUserid(userid uint32, userInfo *proto.T_Users) bool {
+	return dp.db.Where("userid = ? ", userid).
+		Select("userid, account, name, sex, headimg, level, exp, coins, gems, roomid").
+		Find(&userInfo).
+		RowsAffected != 0
+}
+
+func (dp *DbProxy) ModifyUserInfo(userid uint32, userInfo *proto.T_Users) bool {
+	return dp.db.Model(&proto.T_Users{}).
+		Where("userid = ?", userid).
+		Update(userInfo).
+		RowsAffected != 0
+}
+
+func (dp *DbProxy) GetUserHistoryByUserid(userid uint32, userInfo *proto.T_Users) bool {
+	return dp.db.Where("userid = ? ", userid).
+		Select("history").
+		Find(&userInfo).
+		RowsAffected != 0
+}
+
+func (dp *DbProxy) GetUserGemsByUserid(userid uint32, userInfo *proto.T_Users) bool {
+	return dp.db.Where("userid = ? ", userid).
+		Select("gems").
+		Find(&userInfo).
+		RowsAffected != 0
+}
+
+func (dp *DbProxy) GetUserBaseInfo(userid uint32, userInfo *proto.T_Users) bool {
+	return dp.db.Where("userid = ? ", userid).
+		Select("name, sex, headimg").
+		Find(&userInfo).
+		RowsAffected != 0
+}
+
+// t_rooms : room info
+func (dp *DbProxy) GetRoomInfo(roomid string, roomInfo *proto.T_Rooms) bool {
+	return dp.db.Where(&proto.T_Rooms{Id: roomid}).First(roomInfo).RowsAffected != 0
+}

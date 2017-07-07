@@ -1,5 +1,11 @@
 package proto
 
+type T_MyTest struct {
+	Account 	string 		`gorm:"size:20;type:char(20)"`
+	Name 		string
+	Status 		int
+}
+
 type T_Accounts struct {
 	Account 	string		`gorm:"primary_key"`
 	Password	string
@@ -54,4 +60,18 @@ type T_RoomUser struct {
 	UserIcon 	string 		`gorm:"size:128;not null;default:''"`
 	UserName 	string 		`gorm:"size:32;not null;default:''"`
 	UserScore 	int 		`gorm:"not null;default:0"`
+}
+
+type T_Users struct {
+	Userid 		uint32		`gorm:"primary_key;AUTO_INCREMENT;not null"`
+	Account 	string 		`gorm:"size:32;not null;default:'';index:acc_index"`
+	Name 		string 		`gorm:"size:32;default:null"`
+	Sex 		byte
+	Headimg 	string
+	Level 		uint8 		`gorm:"default:1"`
+	Exp 		uint32		`gorm:"default:0"`
+	Coins 		uint32		`gorm:"default:0"`
+	Gems 		uint32 		`gorm:"default:0"`
+	Roomid 		string 		`gorm:"size:8"`
+	History 	string 		`gorm:"size:4096;not null;default:''"`
 }

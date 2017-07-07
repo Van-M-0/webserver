@@ -42,6 +42,7 @@ func NewWebSocketServer(opts *WebOption) *WebSocketServer {
 }
 
 func (ws *WebSocketServer) Start() {
+	fmt.Println("web socekt start....")
 	http.HandleFunc(ws.Opts.Path, ws.serve)
 	if err := http.ListenAndServe(ws.Opts.Addr, nil); err != nil {
 		fmt.Println("websocekt server start errror ", err)

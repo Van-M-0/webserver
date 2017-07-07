@@ -88,5 +88,20 @@ func (gw *Gateway) InitDabase() {
 	gw.dbProxy.CreateTableIfNot(&proto.T_Message{})
 	gw.dbProxy.CreateTableIfNot(&proto.T_Rooms{})
 	gw.dbProxy.CreateTableIfNot(&proto.T_RoomUser{})
+	gw.dbProxy.CreateTableIfNot(&proto.T_Users{})
+	gw.dbProxy.CreateTableIfNot(&proto.T_MyTest{})
+
+	gw.LoadDatata()
 }
 
+func (gw *Gateway) LoadDatata() {
+	var accInfo proto.T_Accounts
+	gw.dbProxy.GetAccountInfo("van", &accInfo)
+	fmt.Println("get account info ", accInfo)
+
+	var userInfo proto.T_Users
+	gw.dbProxy.GetUserInfo("van", &userInfo)
+	fmt.Println("get user info ", userInfo)
+
+	gw.dbProxy.ModifyUserInfo(1, &proto.T_Users{Account: "van"})
+}

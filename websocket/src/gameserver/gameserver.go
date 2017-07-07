@@ -2,19 +2,20 @@ package gameserver
 
 import (
 	"tcpserver"
-	"proto"
+	"export"
 	"fmt"
+	"proto"
 )
 
 type GameServer struct {
 	gwClient 		*tcpserver.TcpClient
+	mgr 			export.SceneManager
 }
 
-func NewGameServer() *GameServer {
+func NewGameServer(manager export.SceneManager) *GameServer {
 	gs := &GameServer{}
-
 	cli, err := tcpserver.NewDailClient(&tcpserver.TcpOption{
-		Addr: ":9092",
+		Addr: ":9099",
 		Activecb: func(cli *tcpserver.TcpClient) {
 
 		},
@@ -29,17 +30,22 @@ func NewGameServer() *GameServer {
 		},
 	})
 	if err != nil {
-		fmt.Println("create gw client error")
+		fmt.Println("create gw client error ", err)
 		return nil
 	}
+
+	gf := &GameFrame{
+		gameServer: gs,
+	}
+
+	gs.mgr = manager
+	manager.OnInit(gf)
 
 	gs.gwClient = cli
 
 	return gs
 }
 
-func (gs *GameServer) Start() {
-	go gs.tcpServer.Start()
-}
+
 
 

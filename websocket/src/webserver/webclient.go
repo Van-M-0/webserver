@@ -86,11 +86,13 @@ func (wb *WebClient) sendEncode(m *proto.Message) {
 	fmt.Println("write message ", wb.sendbuf, m)
 	w, err := wb.conn.NextWriter(websocket.TextMessage)
 	if err != nil {
+		fmt.Println("web client get next write err ", err)
 		return
 	}
 	w.Write(wb.sendbuf)
 
 	if err := w.Close(); err != nil {
+		fmt.Println("web client flush message error ", err)
 		return
 	}
 }
