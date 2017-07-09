@@ -78,7 +78,7 @@ func (wb *WebClient) readLoop() {
 			return
 		}
 
-		fmt.Println("<web message type> ", mt)
+		fmt.Println("<web message type> ", mt, string(raw))
 
 		var msg proto.Message
 		if err := json.Unmarshal(raw, &msg); err != nil {

@@ -67,7 +67,7 @@ func (sm *LobbySceneMgr) OnClientMessage(id uint32, m *proto.Message) {
 	case proto.CmdCreateAccount:
 		sm.handleCreateAccount(id, m.Msg.(*proto.CreateAccount_C))
 	case proto.CmdCreateRoom:
-		sm.handleCreateRoom(id, m.Msg.(*proto.CreateRoom_C))
+		sm.handleCreateRoom(id, m.Msg.(*proto.CreateRoomXZ_C))
 	default:
 		fmt.Println("recv unkown cmd ", m.Cmd)
 	}
@@ -158,6 +158,6 @@ func (sm *LobbySceneMgr) handleCreateAccount(id uint32, c *proto.CreateAccount_C
 	}
 }
 
-func (sm *LobbySceneMgr) handleCreateRoom(id uint32, c *proto.CreateRoom_C) {
+func (sm *LobbySceneMgr) handleCreateRoom(id uint32, c *proto.CreateRoomXZ_C) {
 
 }

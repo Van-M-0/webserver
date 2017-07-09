@@ -56,7 +56,7 @@ func NewDbProxy(opt *DbOption) *DbProxy {
 	return dp
 }
 
-func (dp *DbProxy) CreatTable(v ...interface{}) {
+func (dp *DbProxy) CreateTable(v ...interface{}) {
 	dp.db.CreateTable(v...)
 }
 

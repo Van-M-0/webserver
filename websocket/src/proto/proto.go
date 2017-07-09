@@ -30,7 +30,7 @@ func NewStruct(cmd uint16) (interface{}, bool) {
 	case CmdCreateAccount:
 		return &CreateAccount_C{}, true
 	case CmdCreateRoom:
-		return &CreateRoom_C{}, true
+		return &CreateRoomXZ_C{}, true
 	}
 	return nil, false
 }
@@ -123,10 +123,23 @@ type CreateAccountSuccess struct {
 	Sign 		string				`json:"sign"`
 }
 
-type CreateRoom_C struct {
+type XZRoomConf struct {
+	CellScore 	int					`json:"difen"`
+	Zimo 		int					`json:"zimo"`
+	Jiangdui 	bool				`json:"jiangdui"`
+	Huansanzhang bool				`json:"huansanzhang"`
+	ZuidaFan 	int					`json:"zuidafanshu"`
+	Jushu 		int					`json:"jushuxuanze"`
+	Dianganghua int				`json:"dianganghua"`
+	Menqing 	bool				`json:"menqing"`
+	Tiandihu 	bool				`json:"tiandihu"`
+	Type 		string				`json:"type"`
+}
+
+type CreateRoomXZ_C struct {
 	Account 	string 				`json:"account"`
 	Sign 		string				`json:"sign"`
-	//Conf		CreateRoomConf		`json:"conf"`
+	Conf		XZRoomConf			`json:"conf"`
 }
 
 type EnterRoom_C struct {

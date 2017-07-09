@@ -93,7 +93,7 @@ cc.Class({
 				})
 			} else {
 				self.so.send(msg)
-				console.log("send msg ", cmd, data)
+				console.log("send msg ", cmd, msg)
 			}
 		},
 	},

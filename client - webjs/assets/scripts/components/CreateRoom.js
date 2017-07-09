@@ -116,7 +116,7 @@ cc.Class({
         var data = {
             account: cc.vv.userMgr.account,
             sign: cc.vv.userMgr.sign,
-            conf: JSON.stringify(conf)
+            conf: conf
         };
         console.log(data);
         //cc.vv.wc.show("正在创建房间");

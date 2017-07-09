@@ -8,28 +8,19 @@ import (
 	"lobby"
 	"encoding/json"
 	"fmt"
+	"proto"
 )
 
 func test() {
-	type MyStruct struct {
-		Name 		string 		`json:"name"`
-	}
-
-	m := &MyStruct{
-		Name: "hello",
-	}
-
-	var i interface{}
-	i = m
-	s := "{'name':'hello'}"
-	b1 := []byte(s)
-
-	json.Unmarshal(b1, i)
-	m2, err := i.(*MyStruct)
-	fmt.Println(m2.Name, err)
+	jstr :=  `{"account":"guest_123","conf":{"difen":123}}`
+	var m proto.CreateRoomXZ_C
+	err := json.Unmarshal([]byte(jstr), &m)
+	fmt.Println(err, "----", m.Conf)
 }
 
 func main() {
+	test()
+
 	gw := gateway.NewGateway(&gateway.GateOption{
 		Addr: ":9091",
 	})
